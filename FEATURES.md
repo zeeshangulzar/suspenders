@@ -14,6 +14,29 @@ Uses [Letter Opener][] to preview emails in the browser instead of sending them.
 
 [Letter Opener]: https://github.com/ryanb/letter_opener
 
+### mailtrap-local (optional)
+
+Alternative to Letter Opener for teams who want a real SMTP catcher in development. [mailtrap-local][] is an MIT-licensed single binary that catches SMTP on `127.0.0.1:3535` and shows a web inbox on `127.0.0.1:3550`, so mail from every process (web, Sidekiq, rake tasks) lands in one place.
+
+```sh
+brew tap mailtrap/local
+brew trust --formula mailtrap/local/mailtrap-local
+brew install mailtrap-local
+brew services start mailtrap-local
+```
+
+Then in `config/environments/development.rb`, replace the Letter Opener delivery method with:
+
+```ruby
+config.action_mailer.delivery_method = :smtp
+config.action_mailer.smtp_settings = {
+  address: ENV.fetch("SMTP_ADDRESS", "127.0.0.1"),
+  port: ENV.fetch("SMTP_PORT", "3535").to_i
+}
+```
+
+[mailtrap-local]: https://github.com/mailtrap/mailtrap-local
+
 ### Strong Migrations
 
 Uses [Strong Migrations][] to catch unsafe migrations in development.
